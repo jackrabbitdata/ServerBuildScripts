@@ -110,17 +110,16 @@ EOF
 # Restart Apache
 sudo systemctl restart apache2
 
-# Set root password
-echo "Please enter a password to set root password in mysql. Ex: example.com"
+# Set mysql root password
+echo "Please enter a password to set root password in mysql."
 read -p 'New Password: ' mysql_password
-sudo mysql <<'EOF'
-ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by "$mysql_password";
-EOF
+sql_script = "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '"$mysql_password"'"
+sudo mysql $mysql_script
 
 # Secure mysql
 echo
 echo "================================================================="
-echo If you want to secure mysql you will need to: 
+echo "If you want to secure mysql you will need to: "
 echo "1. Answer if you want to set up VALIDATE PASSWORD component (No)"
 echo "2. Change password for root? (No)"
 echo "3. Remove anonymous users? (Yes)"
