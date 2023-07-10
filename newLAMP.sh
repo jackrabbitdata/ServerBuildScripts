@@ -160,6 +160,21 @@ sudo apt remove certbot
 sudo snap install --classic certbot
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 
+# Option to increase php parameters
+echo "Option to increase session timeout from 1440 seconds to 28800"
+echo "and max file upload size from 2M to 18M"
+echo -n " Increase php parameters? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Change the session timeout so users can stay logged in all day.
+    sudo sed -i 's/session.gc_maxlifetime = 1440/session.gc_maxlifetime = 28800/' /etc/php/8.1/apache2/php.ini
+
+    # Change the upload file size limit to larger than default
+    sudo sed -i 's/upload_max_filesize = 2/upload_max_filesize = 18/' /etc/php/8.1/apache2/php.ini
+else
+    echo Continuing...
+fi
+
 # Install and configure Postfix for send only
 echo "Fat Free Framework has an SMTP plug-in to prepare e-mail messages (headers & attachments) and send them through a socket connection."
 echo "So postfix is often not needed"
