@@ -160,5 +160,42 @@ sudo apt remove certbot
 sudo snap install --classic certbot
 sudo ln -s /snap/bin/certbot /usr/bin/certbot
 
+# Install and configure Postfix for send only
+echo "Fat Free Framework has an SMTP plug-in to prepare e-mail messages (headers & attachments) and send them through a socket connection."
+echo "So postfix is often not needed"
+echo -n " Install postfix for send only email? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    echo "Please enter relay host for postfix. Ex: [smtp.pobox.com]:587"
+    read -p 'Relay Host: ' postfix_relayhost
+    echo "Please enter relay host login credentials for postfix. Ex: smtp.pobox.com ACCOUNT@pobox.com:PASSWORD"
+    read -p 'Login Credentials: ' postfix_password
+    echo "Please enter email destination for test email. Ex: person@example.com"
+    read -p 'Destination email: ' send_to_email
+    sudo debconf-set-selections <<< "postfix postfix/mailname string $srv_domain"
+    sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+    sudo apt install --assume-yes mailutils
+    sudo postconf -e smtp_tls_security_level=encrypt
+    sudo postconf -e smtp_sasl_auth_enable=yes
+    sudo postconf -e smtp_sasl_password_maps=hash:/etc/postfix/smtp_passwd
+    sudo postconf -e smtp_sasl_security_options=noanonymous
+    sudo postconf -e smtp_sasl_tls_security_options=noanonymous
+    sudo postconf -e relayhost=$postfix_relayhost
+    postconf -n
+    if [[ ! -f /etc/postfix/smtp_passwd ]]; then
+        echo $postfix_password | sudo tee /etc/postfix/smtp_passwd
+        sudo postmap hash:/etc/postfix/smtp_passwd
+        sudo chown root:root /etc/postfix/smtp_passwd
+        sudo chmod 600 /etc/postfix/smtp_passwd
+    fi
+    sudo systemctl restart postfix
+
+    #Send test email
+    echo "The postfix email setup script for $srv_domain has ran." | mail -s "Setup script for $srv_domain postfix ran successfully" $send_to_email
+    echo "Verify email was successfully sent"
+else
+    echo Continuing...
+fi
+
 # Finished
 echo "Script finished"
