@@ -40,6 +40,9 @@ sudo apt --assume-yes upgrade
 # Install Fuzzy Finder
 sudo apt install fzf
 
+# Install Subversion - Can be used to export folders from a git repository
+sudo apt install subversion
+
 # Install the Kakoune editor
 sudo apt install kakoune
 mkdir -p /home/ubuntu/.config/kak
