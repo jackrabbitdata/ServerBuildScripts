@@ -40,7 +40,9 @@ sudo apt --assume-yes upgrade
 # Install Fuzzy Finder
 sudo apt install fzf
 
-# Install Subversion - Can be used to export folders from a git repository
+# Install Subversion
+# Used to export git repositories when versioning is not wanted
+# Ex: Wordpress installations
 sudo apt install subversion
 
 # Install the Kakoune editor
