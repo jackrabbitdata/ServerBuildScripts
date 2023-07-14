@@ -40,11 +40,6 @@ sudo apt --assume-yes upgrade
 # Install Fuzzy Finder
 sudo apt install fzf
 
-# Install Subversion
-# Used to export git repositories when versioning is not wanted
-# Ex: Wordpress installations
-sudo apt install subversion
-
 # Install the Kakoune editor
 sudo apt install kakoune
 mkdir -p /home/ubuntu/.config/kak
@@ -80,6 +75,17 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
 
     # Install command line emmet
     sudo npm i -g emmet-cli
+else
+    echo Continuing...
+fi
+
+echo 'Install Subversion if wanted'
+echo 'Used to export git repositories when versioning is not wanted'
+echo 'Ex: Wordpress installations'
+echo -n "Install Subversion? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    sudo apt --assume-yes install subversion
 else
     echo Continuing...
 fi
