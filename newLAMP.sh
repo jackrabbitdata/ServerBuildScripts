@@ -181,6 +181,7 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
     sudo sed -i 's/session.gc_maxlifetime = 1440/session.gc_maxlifetime = 28800/' /etc/php/8.1/apache2/php.ini
 
     # Change the upload file size limit to larger than default
+    sudo sed -i 's/post_max_size = 8/post_max_size = 18/' /etc/php/8.1/apache2/php.ini
     sudo sed -i 's/upload_max_filesize = 2/upload_max_filesize = 18/' /etc/php/8.1/apache2/php.ini
 else
     echo Continuing...
