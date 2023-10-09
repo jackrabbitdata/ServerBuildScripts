@@ -122,7 +122,7 @@ EOF
 sudo systemctl restart apache2
 
 # Set mysql root password
-echo "Please enter a password to set root password in mysql."
+echo "Please enter a password to set root password in mysql. Do not leave blank! PK"
 read -p 'New Password: ' mysql_password
 sql_script="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '"$mysql_password"';"
 sudo mysql <<EOF
