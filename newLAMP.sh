@@ -57,7 +57,7 @@ curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/.vimrc
 source ~/.bashrc
 
 # Set default git branch name
-git config --global init.defaultBranch <name>
+git config --global init.defaultBranch master
 
 # Remove if exists and add Vundle
 sudo rm -r ~/.vim/bundle
