@@ -56,6 +56,9 @@ curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/.vimrc
 # Source the new .bashrc
 source ~/.bashrc
 
+# Set default git branch name
+git config --global init.defaultBranch <name>
+
 # Remove if exists and add Vundle
 sudo rm -r ~/.vim/bundle
 git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
