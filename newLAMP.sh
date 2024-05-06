@@ -56,8 +56,10 @@ curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/.vimrc
 # Source the new .bashrc
 source ~/.bashrc
 
-# Set default git branch name
+# Set git defaults
 git config --global init.defaultBranch master
+git config --global user.name "Patrick Kehn"
+git config --global user.email kehnpatrick@gmail.com
 
 # Remove if exists and add Vundle
 sudo rm -r ~/.vim/bundle
