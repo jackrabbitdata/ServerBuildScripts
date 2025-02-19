@@ -95,8 +95,29 @@ else
     echo Continuing...
 fi
 
-# Install Web Server, Database, PHP, and common PHP libraries
+echo 'Install Docker if wanted'
+echo -n "Install Docker? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    sudo apt --assume-yes install docker.io docker-compose-v2
+else
+    echo Continuing...
+fi
+
+echo 'Install Ledger-cli if wanted'
+echo -n "Install Ledger-cli? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    sudo apt --assume-yes install ledger
+else
+    echo Continuing...
+fi
+
+# Install Web Server, Mysql, PHP, and common PHP libraries
 sudo apt --assume-yes install apache2 mysql-server mysql-client php libapache2-mod-php php-mysql php-curl php-gd php-imagick php-intl php-common php-mbstring php-xml php-zip
+
+# Install Postgres database
+sudo apt --assume-yes install postgresql postgresql-contrib postgresql-client php-pdo-pgsql
 
 # Enable some apache modules
 sudo a2enmod rewrite
