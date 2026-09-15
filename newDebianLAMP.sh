@@ -117,7 +117,7 @@ else
 fi
 
 # Install Web Server, Mysql, PHP, and common PHP libraries
-sudo apt --assume-yes install apache2 mysql-server mysql-client php libapache2-mod-php php-mysql php-curl php-gd php-imagick php-intl php-common php-mbstring php-xml php-zip
+sudo apt --assume-yes install apache2 mariadb-server mariadb-client php libapache2-mod-php php-mysql php-curl php-gd php-imagick php-intl php-common php-mbstring php-xml php-zip
 
 # Install Postgres database
 sudo apt --assume-yes install postgresql postgresql-contrib postgresql-client php-pdo-pgsql
