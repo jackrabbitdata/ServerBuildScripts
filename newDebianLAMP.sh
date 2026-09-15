@@ -116,7 +116,7 @@ else
     echo Continuing...
 fi
 
-# Install Web Server, Mysql, PHP, and common PHP libraries
+# Install Web Server, MariaDB, PHP, and common PHP libraries
 sudo apt --assume-yes install apache2 mariadb-server mariadb-client php libapache2-mod-php php-mysql php-curl php-gd php-imagick php-intl php-common php-mbstring php-xml php-zip
 
 # Install Postgres database
@@ -150,18 +150,18 @@ EOF
 # Restart Apache
 sudo systemctl restart apache2
 
-# Set mysql root password
-echo "Please enter a password to set root password in mysql. Do not leave blank! PK"
-read -p 'New Password: ' mysql_password
-sql_script="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '"$mysql_password"';"
-sudo mysql <<EOF
+# Set MariaDB root password
+echo "Please enter a password to set root password in MariaDB. Do not leave blank! PK"
+read -p 'New Password: ' mariadb_password
+sql_script="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '"$mariadb_password"';"
+sudo mariadb <<EOF
 $sql_script
 EOF
 
-# Secure mysql
+# Secure MariaDB
 echo
 echo "================================================================="
-echo "If you want to secure mysql you will need to: "
+echo "If you want to secure MariaDB you will need to: "
 echo "1. Answer if you want to set up VALIDATE PASSWORD component (No)"
 echo "2. Change password for root? (No)"
 echo "3. Remove anonymous users? (Yes)"
@@ -169,8 +169,8 @@ echo "4. Disallow root login remotely? (No) This is the only way to connect remo
 echo "5. Remove test database and access to it? (Yes)"
 echo "6. Reload privilege tables now? (Yes)"
 echo "================================================================="
-echo "You will need to use sudo to login. example: sudo mysql -u root -p"
-echo -n " Secure mysql? (y/n)? "
+echo "You will need to use sudo to login. example: sudo mariadb -u root -p"
+echo -n " Secure MariaDB? (y/n)? "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
     sudo mariadb-secure-installation
@@ -181,8 +181,8 @@ fi
 # Change bind-address to listen on all interfaces instead of 127.0.0.1 which is localhost only.
 # If you need to restrict access to certain users from specific IP addresses, utilize create/grant user like this CREATE USER 'bobdole'@'192.168.10.221';
 # Or possibly even better, use the AWS security groups functionality.
-sudo sed -i '/bind-address/c\bind-address = 0.0.0.0' /etc/mysql/mysql.conf.d/mysqld.cnf
-sudo systemctl restart mysql
+sudo sed -i '/bind-address/c\bind-address = 0.0.0.0' /etc/mysql/mariadb.conf.d/50-server.cnf
+sudo systemctl restart mariadb
 
 # Install Composer https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
 # It needs unzip
