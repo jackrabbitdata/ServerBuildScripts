@@ -173,7 +173,7 @@ echo "You will need to use sudo to login. example: sudo mysql -u root -p"
 echo -n " Secure mysql? (y/n)? "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
-    sudo mysql_secure_installation
+    sudo mariadb-secure-installation
 else
     echo Continuing...
 fi
