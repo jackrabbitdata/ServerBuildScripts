@@ -40,6 +40,9 @@ sudo apt --assume-yes upgrade
 # Install Fuzzy Finder
 sudo apt install fzf
 
+# Install git
+sudo apt install git
+
 # Install the Kakoune editor
 sudo apt install kakoune
 mkdir -p /home/admin/.config/kak
