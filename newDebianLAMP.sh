@@ -195,10 +195,8 @@ sudo mv composer.phar /usr/local/bin/composer
 # Install web log analyzer GoAccess
 sudo apt --assume-yes install goaccess
 
-# Uninstall package version off certbot and install snap
-sudo apt remove certbot
-sudo snap install --classic certbot
-sudo ln -s /snap/bin/certbot /usr/bin/certbot
+# Install certbot
+sudo apt install certbot python3-certbot-apache -y
 
 # Option to increase php parameters
 echo "Option to increase session timeout from 1440 seconds to 28800"
