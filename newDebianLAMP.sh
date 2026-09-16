@@ -1,5 +1,5 @@
 #! /bin/bash
-# Set up a LAMP stack on a new Debian server
+# Set up a LAMP stack on a new Debian 13 (Trixie) server
 
 # Use curl to transfer this file from Github
 # curl -O https://raw.githubusercontent.com/jackrabbitdata/ServerBuildScripts/master/newDebianLAMP.sh
@@ -207,11 +207,11 @@ echo -n " Increase php parameters? (y/n)? "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
     # Change the session timeout so users can stay logged in all day.
-    sudo sed -i 's/session.gc_maxlifetime = 1440/session.gc_maxlifetime = 28800/' /etc/php/8.3/apache2/php.ini
+    sudo sed -i 's/session.gc_maxlifetime = 1440/session.gc_maxlifetime = 28800/' /etc/php/8.4/apache2/php.ini
 
     # Change the upload file size limit to larger than default
     sudo sed -i 's/post_max_size = 8/post_max_size = 18/' /etc/php/8.3/apache2/php.ini
-    sudo sed -i 's/upload_max_filesize = 2/upload_max_filesize = 18/' /etc/php/8.3/apache2/php.ini
+    sudo sed -i 's/upload_max_filesize = 2/upload_max_filesize = 18/' /etc/php/8.4/apache2/php.ini
 else
     echo Continuing...
 fi
