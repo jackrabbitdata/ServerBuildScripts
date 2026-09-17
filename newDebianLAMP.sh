@@ -141,6 +141,9 @@ else
     echo Continuing...
 fi
 
+# Install web log analyzer GoAccess
+sudo apt --assume-yes install goaccess
+
 echo "================================================================="
 echo "Optional Applications"
 echo "================================================================="
@@ -150,6 +153,15 @@ read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
     # Install Postgres database
     sudo apt --assume-yes install postgresql postgresql-contrib postgresql-client php-pdo-pgsql
+else
+    echo Continuing...
+fi
+
+echo -n "Install Certbot? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+# Install certbot
+sudo apt --assume-yes install certbot python3-certbot-apache
 else
     echo Continuing...
 fi
@@ -199,10 +211,10 @@ echo -n "Install Fuzzy Finder and Kakoune editor? (y/n)? "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
     # Install Fuzzy Finder
-    sudo apt install fzf
+    sudo apt --assume-yes install fzf
 
     # Install the Kakoune editor
-    sudo apt install kakoune
+    sudo apt --assume-yes install kakoune
     mkdir -p /home/admin/.config/kak
     cd /home/admin/.config/kak/
     curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/kakrc
@@ -260,19 +272,20 @@ else
     echo Continuing...
 fi
 
-# Install Composer https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
-# It needs unzip
-sudo apt --assume-yes install unzip
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php composer-setup.php --quiet
-rm composer-setup.php
-sudo mv composer.phar /usr/local/bin/composer
-
-# Install web log analyzer GoAccess
-sudo apt --assume-yes install goaccess
-
-# Install certbot
-sudo apt install certbot python3-certbot-apache -y
+echo 'Install PHP Composer if wanted'
+echo -n "Install Composer? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Install Composer https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
+    # It needs unzip
+    sudo apt --assume-yes install unzip
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    php composer-setup.php --quiet
+    rm composer-setup.php
+    sudo mv composer.phar /usr/local/bin/composer
+else
+    echo Continuing...
+fi
 
 echo 'Install Docker if wanted'
 echo -n "Install Docker? (y/n)? "
