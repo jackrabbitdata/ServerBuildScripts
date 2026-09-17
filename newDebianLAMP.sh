@@ -172,6 +172,7 @@ echo "So postfix is often not needed"
 echo -n " Install postfix for send only email? (y/n)? "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
+    sudo apt --assume-yes install postfix
     echo "Please enter relay host for postfix. Ex: [smtp.pobox.com]:587"
     read -p 'Relay Host: ' postfix_relayhost
     echo "Please enter relay host login credentials for postfix. Ex: smtp.pobox.com ACCOUNT@pobox.com:PASSWORD"
