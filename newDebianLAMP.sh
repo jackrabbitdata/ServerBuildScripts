@@ -300,13 +300,13 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
 
     # Add the repository to Apt sources:
     sudo tee /etc/apt/sources.list.d/docker.sources <<- EOF
-    Types: deb
-    URIs: https://download.docker.com/linux/debian
-    Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
-    Components: stable
-    Architectures: $(dpkg --print-architecture)
-    Signed-By: /etc/apt/keyrings/docker.asc
-    EOF
+	Types: deb
+	URIs: https://download.docker.com/linux/debian
+	Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+	Components: stable
+	Architectures: $(dpkg --print-architecture)
+	Signed-By: /etc/apt/keyrings/docker.asc
+	EOF
 
     sudo apt update
     sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
