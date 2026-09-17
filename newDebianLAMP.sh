@@ -7,18 +7,22 @@
 # Run chmod 744 newDebianLAMP.sh
 # Run it by typing ./newDebianLAMP.sh
 
-#Set server/domain name variable that will be used throughout the script
-echo "Please enter server name. Ex: example.com"
-read -p 'Server name: ' srv_domain
+echo -n "Set the hostname? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Set hostname
+    echo "Please enter server name. Ex: example.com"
+    read -p 'Server name: ' srv_domain
+    sudo hostnamectl set-hostname $srv_domain
+    hostnamectl
+else
+    echo Continuing...
+fi
 
 # Set time zone
 # Check with timedatectl
 sudo timedatectl set-timezone America/Chicago
 timedatectl
-
-# Set hostname
-sudo hostnamectl set-hostname $srv_domain
-hostnamectl
 
 # Install swap file if needed
 echo -n "On instances with less than 1G of memory, a swap file will likely be needed to run composer. Add a 1GB swap file? (y/n)? "
@@ -33,45 +37,56 @@ else
     echo Continuing...
 fi
 
+# Remove any existing and add my .bashrc
+rm .bashrc
+curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/.bashrc
+# Source the new .bashrc
+source ~/.bashrc
+
 #Upgrade apt
 sudo apt update
 sudo apt --assume-yes upgrade
 
-# Install Fuzzy Finder
-sudo apt install fzf
-
 # Install git
 sudo apt install git
-
-# Install the Kakoune editor
-sudo apt install kakoune
-mkdir -p /home/admin/.config/kak
-cd /home/admin/.config/kak/
-curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/kakrc
-cd
-
-# Remove any existing and add my dot files
-rm .bashrc
-curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/.bashrc
-rm .vimrc
-curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/.vimrc
-
-# Source the new .bashrc
-source ~/.bashrc
-
 # Set git defaults
 git config --global init.defaultBranch master
 git config --global user.name "Patrick Kehn"
 git config --global user.email kehnpatrick@gmail.com
 
-# Remove if exists and add Vundle
-sudo rm -r ~/.vim/bundle
-git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-cd
+echo -n "Install Fuzzy Finder and Kakoune editor? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Install Fuzzy Finder
+    sudo apt install fzf
 
-# The following command will install the latest Vundle plugins without any user interaction with Vim.
-# The -c option allows one to run a command before Vim starts up, and you can have up to 32 -c commands, according to the man page. So this snippet tells Vim to run the PluginInstall command (from Vundle) and then qa! to quit all windows.
-vim -c 'PluginInstall' -c 'qa!'
+    # Install the Kakoune editor
+    sudo apt install kakoune
+    mkdir -p /home/admin/.config/kak
+    cd /home/admin/.config/kak/
+    curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/kakrc
+    cd
+else
+    echo Continuing...
+fi
+
+
+echo -n "Install Vendle and .vimrc? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Remove if exists and add Vundle
+    rm .vimrc
+    curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/.vimrc
+    sudo rm -r ~/.vim/bundle
+    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    cd
+
+    # The following command will install the latest Vundle plugins without any user interaction with Vim.
+    # The -c option allows one to run a command before Vim starts up, and you can have up to 32 -c commands, according to the man page. So this snippet tells Vim to run the PluginInstall command (from Vundle) and then qa! to quit all windows.
+    vim -c 'PluginInstall' -c 'qa!'
+else
+    echo Continuing...
+fi
 
 # Install node and Emmet if wanted
 echo -n "Install node and command line emmet? (y/n)? "
@@ -80,7 +95,6 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
     # Install node.js
     curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
     sudo apt-get install -y nodejs
-
     # Install command line emmet
     sudo npm i -g emmet-cli
 else
@@ -96,32 +110,6 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
     sudo apt --assume-yes install subversion
 else
     echo Continuing...
-fi
-
-echo 'Install Docker if wanted'
-echo -n "Install Docker? (y/n)? "
-read answer
-if [ "$answer" != "${answer#[Yy]}" ] ;then
-# Add Docker's official GPG key:
-sudo apt install ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-# Add the repository to Apt sources:
-sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/debian
-Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
-Components: stable
-Architectures: $(dpkg --print-architecture)
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
-
-sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-else
-echo Continuing...
 fi
 
 echo 'Install Ledger-cli if wanted'
@@ -266,6 +254,32 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
     echo "Verify email was successfully sent"
 else
     echo Continuing...
+fi
+
+echo 'Install Docker if wanted'
+echo -n "Install Docker? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Add Docker's official GPG key:
+    sudo apt install ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+    # Add the repository to Apt sources:
+    sudo tee /etc/apt/sources.list.d/docker.sources <<-EOF
+    Types: deb
+    URIs: https://download.docker.com/linux/debian
+    Suites: $(. /etc/os-release && echo "$VERSION_CODENAME")
+    Components: stable
+    Architectures: $(dpkg --print-architecture)
+    Signed-By: /etc/apt/keyrings/docker.asc
+    EOF
+
+    sudo apt update
+    sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+else
+echo Continuing...
 fi
 
 # Finished
