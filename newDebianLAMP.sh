@@ -7,13 +7,19 @@
 # Run chmod 744 newDebianLAMP.sh
 # Run it by typing ./newDebianLAMP.sh
 
+# Assign the current hostname to a variable
+current_host=$(hostname)
+
+# Print the hostname
+echo "The current hostname is: $current_host"
+
 echo -n "Set the hostname? (y/n)? "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
     # Set hostname
     echo "Please enter server name. Ex: example.com"
-    read -p 'Server name: ' srv_domain
-    sudo hostnamectl set-hostname $srv_domain
+    read -p 'Server name: ' current_host
+    sudo hostnamectl set-hostname $current_host
     hostnamectl
 else
     echo Continuing...
@@ -48,84 +54,14 @@ sudo apt update
 sudo apt --assume-yes upgrade
 
 # Install git
-sudo apt install git
+sudo apt --assume-yes install git
 # Set git defaults
 git config --global init.defaultBranch master
 git config --global user.name "Patrick Kehn"
 git config --global user.email kehnpatrick@gmail.com
 
-echo -n "Install Fuzzy Finder and Kakoune editor? (y/n)? "
-read answer
-if [ "$answer" != "${answer#[Yy]}" ] ;then
-    # Install Fuzzy Finder
-    sudo apt install fzf
-
-    # Install the Kakoune editor
-    sudo apt install kakoune
-    mkdir -p /home/admin/.config/kak
-    cd /home/admin/.config/kak/
-    curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/kakrc
-    cd
-else
-    echo Continuing...
-fi
-
-
-echo -n "Install Vendle and .vimrc? (y/n)? "
-read answer
-if [ "$answer" != "${answer#[Yy]}" ] ;then
-    # Remove if exists and add Vundle
-    rm .vimrc
-    curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/.vimrc
-    sudo rm -r ~/.vim/bundle
-    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
-    cd
-
-    # The following command will install the latest Vundle plugins without any user interaction with Vim.
-    # The -c option allows one to run a command before Vim starts up, and you can have up to 32 -c commands, according to the man page. So this snippet tells Vim to run the PluginInstall command (from Vundle) and then qa! to quit all windows.
-    vim -c 'PluginInstall' -c 'qa!'
-else
-    echo Continuing...
-fi
-
-# Install node and Emmet if wanted
-echo -n "Install node and command line emmet? (y/n)? "
-read answer
-if [ "$answer" != "${answer#[Yy]}" ] ;then
-    # Install node.js
-    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-    sudo apt-get install -y nodejs
-    # Install command line emmet
-    sudo npm i -g emmet-cli
-else
-    echo Continuing...
-fi
-
-echo 'Install Subversion if wanted'
-echo 'Used to export git repositories when versioning is not wanted'
-echo 'Ex: Wordpress installations'
-echo -n "Install Subversion? (y/n)? "
-read answer
-if [ "$answer" != "${answer#[Yy]}" ] ;then
-    sudo apt --assume-yes install subversion
-else
-    echo Continuing...
-fi
-
-echo 'Install Ledger-cli if wanted'
-echo -n "Install Ledger-cli? (y/n)? "
-read answer
-if [ "$answer" != "${answer#[Yy]}" ] ;then
-    sudo apt --assume-yes install ledger
-else
-    echo Continuing...
-fi
-
 # Install Web Server, MariaDB, PHP, and common PHP libraries
 sudo apt --assume-yes install apache2 mariadb-server mariadb-client php libapache2-mod-php php-mysql php-curl php-gd php-imagick php-intl php-common php-mbstring php-xml php-zip
-
-# Install Postgres database
-sudo apt --assume-yes install postgresql postgresql-contrib postgresql-client php-pdo-pgsql
 
 # Enable some apache modules
 sudo a2enmod rewrite
@@ -189,20 +125,6 @@ fi
 sudo sed -i '/bind-address/c\bind-address = 0.0.0.0' /etc/mysql/mariadb.conf.d/50-server.cnf
 sudo systemctl restart mariadb
 
-# Install Composer https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
-# It needs unzip
-sudo apt --assume-yes install unzip
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php composer-setup.php --quiet
-rm composer-setup.php
-sudo mv composer.phar /usr/local/bin/composer
-
-# Install web log analyzer GoAccess
-sudo apt --assume-yes install goaccess
-
-# Install certbot
-sudo apt install certbot python3-certbot-apache -y
-
 # Option to increase php parameters
 echo "Option to increase session timeout from 1440 seconds to 28800"
 echo "and max file upload size from 2M to 18M"
@@ -219,6 +141,19 @@ else
     echo Continuing...
 fi
 
+echo "================================================================="
+echo "Optional Applications"
+echo "================================================================="
+
+echo -n "Install Postgres? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Install Postgres database
+    sudo apt --assume-yes install postgresql postgresql-contrib postgresql-client php-pdo-pgsql
+else
+    echo Continuing...
+fi
+
 # Install and configure Postfix for send only
 echo "Fat Free Framework has an SMTP plug-in to prepare e-mail messages (headers & attachments) and send them through a socket connection."
 echo "So postfix is often not needed"
@@ -231,7 +166,7 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
     read -p 'Login Credentials: ' postfix_password
     echo "Please enter email destination for test email. Ex: person@example.com"
     read -p 'Destination email: ' send_to_email
-    sudo debconf-set-selections <<< "postfix postfix/mailname string $srv_domain"
+    sudo debconf-set-selections <<< "postfix postfix/mailname string $current_host"
     sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
     sudo apt install --assume-yes mailutils
     sudo postconf -e smtp_tls_security_level=encrypt
@@ -250,11 +185,94 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
     sudo systemctl restart postfix
 
     #Send test email
-    echo "The postfix email setup script for $srv_domain has ran." | mail -s "Setup script for $srv_domain postfix ran successfully" $send_to_email
+    echo "The postfix email setup script for $current_host has ran." | mail -s "Setup script for $current_host postfix ran successfully" $send_to_email
     echo "Verify email was successfully sent"
 else
     echo Continuing...
 fi
+
+echo "================================================================="
+echo "Optional Dev Tools"
+echo "================================================================="
+
+echo -n "Install Fuzzy Finder and Kakoune editor? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Install Fuzzy Finder
+    sudo apt install fzf
+
+    # Install the Kakoune editor
+    sudo apt install kakoune
+    mkdir -p /home/admin/.config/kak
+    cd /home/admin/.config/kak/
+    curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/kakrc
+    cd
+else
+    echo Continuing...
+fi
+
+echo -n "Install Vendle and .vimrc? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Remove if exists and add Vundle
+    rm .vimrc
+    curl -O https://raw.githubusercontent.com/jackrabbitdata/dot-files/master/.vimrc
+    sudo rm -r ~/.vim/bundle
+    git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+    cd
+    # The following command will install the latest Vundle plugins without any user interaction with Vim.
+    # The -c option allows one to run a command before Vim starts up, and you can have up to 32 -c commands, according to the man page. So this snippet tells Vim to run the PluginInstall command (from Vundle) and then qa! to quit all windows.
+    vim -c 'PluginInstall' -c 'qa!'
+else
+    echo Continuing...
+fi
+
+# Install node and Emmet if wanted
+echo -n "Install node and command line emmet? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    # Install node.js
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+    # Install command line emmet
+    sudo npm i -g emmet-cli
+else
+    echo Continuing...
+fi
+
+echo 'Install Subversion if wanted'
+echo 'Used to export git repositories when versioning is not wanted'
+echo 'Ex: Wordpress installations'
+echo -n "Install Subversion? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    sudo apt --assume-yes install subversion
+else
+    echo Continuing...
+fi
+
+echo 'Install Ledger-cli if wanted'
+echo -n "Install Ledger-cli? (y/n)? "
+read answer
+if [ "$answer" != "${answer#[Yy]}" ] ;then
+    sudo apt --assume-yes install ledger
+else
+    echo Continuing...
+fi
+
+# Install Composer https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
+# It needs unzip
+sudo apt --assume-yes install unzip
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php composer-setup.php --quiet
+rm composer-setup.php
+sudo mv composer.phar /usr/local/bin/composer
+
+# Install web log analyzer GoAccess
+sudo apt --assume-yes install goaccess
+
+# Install certbot
+sudo apt install certbot python3-certbot-apache -y
 
 echo 'Install Docker if wanted'
 echo -n "Install Docker? (y/n)? "
@@ -279,7 +297,7 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
     sudo apt update
     sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 else
-echo Continuing...
+    echo Continuing...
 fi
 
 # Finished
