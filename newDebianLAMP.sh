@@ -169,6 +169,7 @@ fi
 # Install and configure Postfix for send only
 echo "Fat Free Framework has an SMTP plug-in to prepare e-mail messages (headers & attachments) and send them through a socket connection."
 echo "So postfix is often not needed"
+echo "NOTE: This should probably be switched out to msmtp"
 echo -n " Install postfix for send only email? (y/n)? "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
